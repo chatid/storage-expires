@@ -29,7 +29,7 @@
   // Wrap some storage interface with key-expiration by prepending a timestamp with all
   // writes. Also performs JSON stringification.
   var StorageExpires = function(storage) {
-    this.storage = storage || lsWrapper;
+    this.storage = this.storage || storage || lsWrapper;
   }
 
   StorageExpires.prototype = {
