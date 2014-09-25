@@ -6,102 +6,107 @@
 
 (function (root, factory) {
   if (typeof define === 'function' && define.amd) define('storage-expires', factory);
+  else if (typeof exports === 'object') module.exports = factory();
   else root.StorageExpires = factory();
 }(this, function() {
 
-  // Wrap localStorage so it may be swapped out.
-  var lsWrapper = {
-    get: function(key) {
-      return localStorage.getItem(key);
-    },
-    set: function(key, value) {
-      return localStorage.setItem(key, value);
-    },
-    unset: function(keys) {
-      if (!(keys instanceof Array)) keys = [keys];
-      for (i = 0; i < keys.length; i++) localStorage.removeItem(keys[i]);
+  var slice = [].slice;
+
+  // ref `_.extend`
+  var extend = function(obj) {
+    var args = slice.call(arguments, 1),
+        props;
+    for (var i = 0; i < args.length; i++) {
+      if (props = args[i]) {
+        for (var prop in props) {
+          obj[prop] = props[prop];
+        }
+      }
     }
+    return obj;
   };
 
   // StorageExpires
   // --------------
 
-  // Wrap some storage interface with key-expiration by prepending a timestamp with all
-  // writes. Also performs JSON stringification.
+  // Decorate storage interface with key-expiration by prepending a timestamp to writes.
   var StorageExpires = function(storage) {
-    this.storage = this.storage || storage || lsWrapper;
-  }
 
-  StorageExpires.prototype = {
+    return extend({}, storage, {
 
-    // Prepend a timestamp to any value.
-    serialize: function(value, options) {
-      var e;
-      options = options || {};
-      value = ' ' + JSON.stringify(value);
-      if (e = +options.expires) value = e + value;
-      return value;
-    },
+      // Fetch and serialize the value for a given key. Delete the key if it's expired or
+      // does not comply with the protocol.
+      get: function(key) {
+        var storageExpires = this,
+            value = storage.get.apply(this, arguments) || '',
+            fail = function(key) { storageExpires.unset(key); },
+            ref, expires;
 
-    // Parse the timestamp and value, returning [undefined, undefined] if the value
-    // does not comply with the protocol.
-    deserialize: function(data) {
-      var index, expires, value,
-          fail = function() { return [undefined, undefined]; };
+        // Fail if `value` doesn't comply with expirable-key protocol.
+        if (typeof value != 'string') return fail(key);
 
-      if (!data) return fail();
+        ref = this.decode(value);
+        expires = ref[0];
+        value = ref[1];
 
-      index = data.indexOf(' ');
+        // `undefined` does not comply with protocol.
+        if (expires == undefined) {
+          return fail(key);
+        // Empty string means no expiration.
+        } else if (expires != -1) {
+          if (new Date(expires) < new Date) return fail(key);
+        }
 
-      if (index === -1) return fail();
+        return value;
+      },
 
-      expires = data.substring(0, index);
-      value = data.substring(index + 1);
+      set: function(key, value, options) {
+        return storage.set(key, this.encode(value, options));
+      },
 
-      try { value = JSON.parse(value); }
-      catch (e) { return fail(); }
+      serialize: function(value, options) {
+        return value;
+      },
 
-      return [expires, value];
-    },
+      deserialize: function(data) {
+        return data;
+      },
 
-    // Fetch and serialize the value for a given key. Delete the key if it's expired or
-    // does not comply with the protocol.
-    get: function(key) {
-      var self = this,
-          value = this.storage.get(key) || '',
-          fail = function(key) { self.unset(key); return undefined; },
-          ref, expires;
+      // Prepend a timestamp to any value.
+      encode: function(value, options) {
+        var e;
+        options = options || {};
+        value = (+options.expires || -1) + ' ' + JSON.stringify(value);
+        return value;
+      },
 
-      // Fail if `value` doesn't comply with expirable-key protocol.
-      if (typeof value != 'string') return fail(key);
+      // Parse the timestamp and value, returning [undefined, undefined] if the value
+      // does not comply with the protocol.
+      decode: function(data) {
+        var index, expires, value,
+            fail = function() { return [undefined, undefined]; };
 
-      ref = this.deserialize(value);
-      expires = ref[0];
-      value = ref[1];
+        if (!data) return fail();
 
-      // `undefined` does not comply with protocol.
-      if (expires == undefined) {
-        return fail(key);
-      // Empty string means no expiration.
-      } else if (expires != '') {
-        expires = parseInt(expires);
+        index = data.indexOf(' ');
+
+        if (index === -1) return fail();
+
+        expires = parseInt(data.substring(0, index));
+        value = data.substring(index + 1);
+
         // Check for NaN
-        if (expires != +expires) return fail(key);
-        if (new Date(expires) < new Date) return fail(key);
-      }
+        if (expires != +expires) return fail();
 
-      return value;
-    },
+        try { value = JSON.parse(value); }
+        catch (e) { return fail(); }
 
-    set: function(key, value, options) {
-      value = this.serialize(value, options);
-      return this.storage.set(key, value);
-    },
+        return [expires, value];
+      },
 
-    unset: function(key) {
-      return this.storage.unset(key);
-    }
-  }
+    });
+
+  };
 
   return StorageExpires;
 

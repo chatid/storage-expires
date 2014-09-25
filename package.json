@@ -1,0 +1,39 @@
+{
+  "name": "storage-expires",
+  "version": "0.0.0",
+  "description": "storage-expires ---------------",
+  "main": "storage-expires.js",
+  "directories": {
+    "test": "test"
+  },
+  "devDependencies": {
+    "mocha": "^1.21.4",
+    "underscore": "^1.7.0",
+    "phantomjs": "^1.9.10",
+    "mocha-phantomjs": "^3.5.0",
+    "debowerify": "^0.8.1",
+    "expect.js": "^0.3.1",
+    "watchify": "^1.0.6"
+  },
+  "scripts": {
+    "browserify": "browserify test/*.js",
+    "test": "npm run bundle; mocha-phantomjs test/index.html",
+    "bundle": "browserify test/*.js -o test.js",
+    "watch": "watchify test/*.js -o test.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/chatid/storage-expires.git"
+  },
+  "author": "Misha Ponizil",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/chatid/storage-expires/issues"
+  },
+  "homepage": "https://github.com/chatid/storage-expires",
+  "browserify": {
+    "transform": [
+      "debowerify"
+    ]
+  }
+}
