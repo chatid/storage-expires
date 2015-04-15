@@ -92,7 +92,7 @@
 
         if (index === -1) return fail();
 
-        expires = parseInt(data.substring(0, index));
+        expires = parseInt(data.substring(0, index), 10);
         value = data.substring(index + 1);
 
         // Check for NaN
