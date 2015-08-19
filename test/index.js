@@ -16,29 +16,32 @@ var lsWrapper = {
 
 describe("StorageExpires", function() {
 
+  var clock;
+
+  beforeEach(function() {
+    clock = sinon.useFakeTimers();
+  })
+
   afterEach(function() {
     localStorage.clear();
+    clock.restore();
   });
 
-  it("expires keys according to options.expires", function(done) {
+  it("expires keys according to options.expires", function() {
 
     var storage = StorageExpires(lsWrapper);
     storage.set('test', 'value', { expires: +new Date + 500 });
     expect(storage.get('test')).to.be('value');
-    setTimeout(function() {
-      expect(storage.get('test')).to.be('value');
-      setTimeout(function() {
-        expect(storage.get('test')).to.be('value');
-        setTimeout(function() {
-          expect(storage.get('test')).to.be(undefined);
-          done();
-        }, 480);
-      }, 200);
-    }, 20);
+    clock.tick(20);
+    expect(storage.get('test')).to.be('value');
+    clock.tick(200);
+    expect(storage.get('test')).to.be('value');
+    clock.tick(480);
+    expect(storage.get('test')).to.be(undefined);
 
   });
 
-  it("supports structured data.", function(done) {
+  it("supports structured data.", function() {
     var storage = StorageExpires(lsWrapper);
     storage.set('test', {
       string: 'test',
@@ -54,10 +57,8 @@ describe("StorageExpires", function() {
     expect(test.array[0]).to.be('foo');
     expect(test.array[1]).to.be('bar');
     expect(test.array[2]).to.be(89);
-    setTimeout(function() {
-      expect(storage.get('test')).to.be(undefined);
-      done();
-    }, 200);
+    clock.tick(200);
+    expect(storage.get('test')).to.be(undefined);
   });
 
   it("exposes #decode.", function() {
@@ -72,21 +73,17 @@ describe("StorageExpires", function() {
     expect(value).to.be('value');
   });
 
-  it("never expires by default.", function(done) {
+  it("never expires by default.", function() {
 
     var storage = StorageExpires(lsWrapper);
     storage.set('test', 'value');
     expect(storage.get('test')).to.be('value');
-    setTimeout(function() {
-      expect(storage.get('test')).to.be('value');
-      setTimeout(function() {
-        expect(storage.get('test')).to.be('value');
-        setTimeout(function() {
-          expect(storage.get('test')).to.be('value');
-          done();
-        }, 480);
-      }, 200);
-    }, 20);
+    clock.tick(20);
+    expect(storage.get('test')).to.be('value');
+    clock.tick(200);
+    expect(storage.get('test')).to.be('value');
+    clock.tick(480);
+    expect(storage.get('test')).to.be('value');
 
   });
 
