@@ -4,9 +4,9 @@
 	else if(typeof define === 'function' && define.amd)
 		define(factory);
 	else if(typeof exports === 'object')
-		exports["main"] = factory();
+		exports["storage-expires"] = factory();
 	else
-		root["main"] = factory();
+		root["storage-expires"] = factory();
 })(this, function() {
 return /******/ (function(modules) { // webpackBootstrap
 /******/ 	// The module cache
@@ -52,7 +52,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /************************************************************************/
 /******/ ([
 /* 0 */
-/***/ function(module, exports) {
+/***/ function(module, exports, __webpack_require__) {
 
 	/*
 	 * Storage Expires
@@ -60,7 +60,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	 * Key expiration for any storage interface (defaults to LocalStorage)
 	*/
 
-	var slice = [].slice;
+	var assign = __webpack_require__(1);
 
 	var lsWrapper = {
 	  get: function(key) {
@@ -85,7 +85,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    storage = lsWrapper;
 	  }
 
-	  return Object.assign({}, storage, {
+	  return assign({}, storage, {
 
 	    // Fetch and serialize the value for a given key. Delete the key if it's expired or
 	    // does not comply with the protocol.
@@ -159,6 +159,26 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	  });
 
+	};
+
+
+/***/ },
+/* 1 */
+/***/ function(module, exports) {
+
+	var slice = [].slice;
+
+	module.exports = function(obj) {
+	  var args = slice.call(arguments, 1),
+	      props;
+	  for (var i = 0; i < args.length; i++) {
+	    if (props = args[i]) {
+	      for (var prop in props) {
+	        obj[prop] = props[prop];
+	      }
+	    }
+	  }
+	  return obj;
 	};
 
 

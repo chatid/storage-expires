@@ -1,5 +1,7 @@
 module.exports = {
-  entry: ['./storage-expires'],
+  entry: {
+    'storage-expires': './storage-expires'
+  },
   output: {
     path: __dirname + '/dist',
     filename: '[name].js',
