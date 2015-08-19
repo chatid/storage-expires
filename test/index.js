@@ -133,4 +133,33 @@ describe("StorageExpires", function() {
     expect(getter()).to.be(undefined);
   });
 
+  it("wraps any storage interface", function() {
+    var myStorage = {
+      _store: {},
+      get: function(key) {
+        return this._store[key];
+      },
+      set: function(key, value, options) {
+        return this._store[key] = value;
+      },
+      unset: function(keys) {
+        if (!(keys instanceof Array)) keys = [keys];
+        for (i = 0; i < keys.length; i++) this._store[keys[i]] = null;
+      }
+    }
+    var storage = StorageExpires(myStorage);
+
+    storage.set('foo', 'bar');
+    expect(storage.get('foo')).to.be('bar');
+
+    storage.set('foo', 'bar', { expires: +new Date + 500 });
+    clock.tick(600);
+    expect(storage.get('foo')).to.be(undefined);
+
+    storage.set('foo', 'bar');
+    var ref = storage.decode(myStorage._store.foo);
+    expect(ref[0]).to.be(-1);
+    expect(ref[1]).to.be('bar');
+  });
+
 });
