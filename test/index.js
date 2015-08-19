@@ -1,6 +1,3 @@
-mocha.ui('bdd');
-
-var _ = require('underscore');
 var expect = require('expect.js');
 var StorageExpires = require('../storage-expires');
 
@@ -28,11 +25,11 @@ describe("StorageExpires", function() {
     var storage = StorageExpires(lsWrapper);
     storage.set('test', 'value', { expires: +new Date + 500 });
     expect(storage.get('test')).to.be('value');
-    _.delay(function() {
+    setTimeout(function() {
       expect(storage.get('test')).to.be('value');
-      _.delay(function() {
+      setTimeout(function() {
         expect(storage.get('test')).to.be('value');
-        _.delay(function() {
+        setTimeout(function() {
           expect(storage.get('test')).to.be(undefined);
           done();
         }, 480);
@@ -57,7 +54,7 @@ describe("StorageExpires", function() {
     expect(test.array[0]).to.be('foo');
     expect(test.array[1]).to.be('bar');
     expect(test.array[2]).to.be(89);
-    _.delay(function() {
+    setTimeout(function() {
       expect(storage.get('test')).to.be(undefined);
       done();
     }, 200);
@@ -80,11 +77,11 @@ describe("StorageExpires", function() {
     var storage = StorageExpires(lsWrapper);
     storage.set('test', 'value');
     expect(storage.get('test')).to.be('value');
-    _.delay(function() {
+    setTimeout(function() {
       expect(storage.get('test')).to.be('value');
-      _.delay(function() {
+      setTimeout(function() {
         expect(storage.get('test')).to.be('value');
-        _.delay(function() {
+        setTimeout(function() {
           expect(storage.get('test')).to.be('value');
           done();
         }, 480);
