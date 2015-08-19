@@ -54,13 +54,20 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 0 */
 /***/ function(module, exports, __webpack_require__) {
 
+	module.exports = __webpack_require__(1);
+
+
+/***/ },
+/* 1 */
+/***/ function(module, exports, __webpack_require__) {
+
 	/*
 	 * Storage Expires
 	 *
 	 * Key expiration for any storage interface (defaults to LocalStorage)
 	*/
 
-	var assign = __webpack_require__(1);
+	var assign = __webpack_require__(2);
 
 	var lsWrapper = {
 	  get: function(key) {
@@ -105,7 +112,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	      // `undefined` does not comply with protocol.
 	      if (typeof expires === 'undefined') {
 	        return fail(key);
-	      // Empty string means no expiration.
+	      // -1 means no expiration.
 	      } else if (expires != -1) {
 	        if (new Date(expires) < new Date) return fail(key);
 	      }
@@ -163,7 +170,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 1 */
+/* 2 */
 /***/ function(module, exports) {
 
 	var slice = [].slice;
