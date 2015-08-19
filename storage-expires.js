@@ -49,7 +49,7 @@ module.exports = function(storage) {
       // `undefined` does not comply with protocol.
       if (typeof expires === 'undefined') {
         return fail(key);
-      // Empty string means no expiration.
+      // -1 means no expiration.
       } else if (expires != -1) {
         if (new Date(expires) < new Date) return fail(key);
       }

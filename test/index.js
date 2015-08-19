@@ -28,7 +28,6 @@ describe("StorageExpires", function() {
   });
 
   it("expires keys according to options.expires", function() {
-
     var storage = StorageExpires(lsWrapper);
     storage.set('test', 'value', { expires: +new Date + 500 });
     expect(storage.get('test')).to.be('value');
@@ -38,7 +37,6 @@ describe("StorageExpires", function() {
     expect(storage.get('test')).to.be('value');
     clock.tick(480);
     expect(storage.get('test')).to.be(undefined);
-
   });
 
   it("supports structured data.", function() {
@@ -74,7 +72,6 @@ describe("StorageExpires", function() {
   });
 
   it("never expires by default.", function() {
-
     var storage = StorageExpires(lsWrapper);
     storage.set('test', 'value');
     expect(storage.get('test')).to.be('value');
@@ -85,6 +82,55 @@ describe("StorageExpires", function() {
     clock.tick(480);
     expect(storage.get('test')).to.be('value');
 
+    localStorage.setItem('foo', '-1 "bar"');
+    expect(storage.get('foo')).to.be('bar');
+  });
+
+  it("is graceful when coming across malformed data: not a string", function() {
+    var storage = StorageExpires(lsWrapper);
+    localStorage.setItem('foo', 100);
+    var getter = function() {
+      return storage.get('foo');
+    };
+    expect(getter).to.not.throwException();
+    expect(getter()).to.be(undefined);
+  });
+
+  it("is graceful when coming across malformed data: no space", function() {
+    var storage = StorageExpires(lsWrapper);
+    localStorage.setItem('foo', 'bar');
+    var getter = function() {
+      return storage.get('foo');
+    };
+    expect(getter).to.not.throwException();
+    expect(getter()).to.be(undefined);
+  });
+
+  it("is graceful when coming across malformed data: bad/no timestamp", function() {
+    var storage = StorageExpires(lsWrapper);
+    var getter = function() {
+      return storage.get('foo');
+    };
+
+    localStorage.setItem('foo', 'foo bar');
+    expect(getter).to.not.throwException();
+    expect(getter()).to.be(undefined);
+
+    localStorage.setItem('foo', ' bar');
+    expect(getter).to.not.throwException();
+    expect(getter()).to.be(undefined);
+  });
+
+  it("is graceful when coming across malformed data: bad JSON", function() {
+    var storage = StorageExpires(lsWrapper);
+    var getter = function() {
+      return storage.get('foo');
+    };
+    localStorage.setItem('foo', +new Date + 10000 + ' {"good":"json"}');
+    expect(getter()).to.eql({ good: 'json' });
+    localStorage.setItem('foo', +new Date + 10000 + ' {"bad":json"}');
+    expect(getter).to.not.throwException();
+    expect(getter()).to.be(undefined);
   });
 
 });
