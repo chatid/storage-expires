@@ -9,16 +9,14 @@
   "devDependencies": {
     "expect.js": "^0.3.1",
     "karma": "^0.13.3",
-    "karma-chrome-launcher": "^0.1.8",
     "karma-cli": "0.0.4",
-    "karma-firefox-launcher": "^0.1.4",
     "karma-mocha": "^0.1.10",
     "karma-phantomjs-launcher": "^0.1.4",
-    "karma-safari-launcher": "^0.1.1",
     "karma-sauce-launcher": "^0.2.14",
     "karma-sinon": "^1.0.4",
     "karma-sourcemap-loader": "^0.3.4",
     "karma-webpack": "^1.7.0",
+    "sinon": "^1.16.1",
     "webpack": "^1.8.10"
   },
   "scripts": {

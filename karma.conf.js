@@ -42,11 +42,10 @@ module.exports = function (config) {
       require('karma-webpack'),
       require('karma-mocha'),
       require('karma-phantomjs-launcher'),
-      require('karma-chrome-launcher'),
-      require('karma-firefox-launcher'),
-      require('karma-safari-launcher'),
       require('karma-sauce-launcher'),
       require('karma-sourcemap-loader'),
+      // Need to use special packaged sinon cuz webpack has issues building it
+      // https://github.com/webpack/webpack/issues/304
       require('karma-sinon')
     ],
 
