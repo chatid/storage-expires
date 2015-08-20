@@ -49,14 +49,6 @@ module.exports = function(storage) {
       return storage.set(key, this.encode(value, options));
     },
 
-    serialize: function(value, options) {
-      return value;
-    },
-
-    deserialize: function(data) {
-      return data;
-    },
-
     // Prepend a timestamp to any value.
     encode: function(value, options) {
       var e;
