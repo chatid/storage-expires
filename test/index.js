@@ -10,7 +10,7 @@ var lsWrapper = {
   },
   unset: function(keys) {
     if (!(keys instanceof Array)) keys = [keys];
-    for (i = 0; i < keys.length; i++) localStorage.removeItem(keys[i]);
+    for (var i = 0; i < keys.length; i++) localStorage.removeItem(keys[i]);
   }
 };
 
@@ -144,7 +144,7 @@ describe("StorageExpires", function() {
       },
       unset: function(keys) {
         if (!(keys instanceof Array)) keys = [keys];
-        for (i = 0; i < keys.length; i++) this._store[keys[i]] = null;
+        for (var i = 0; i < keys.length; i++) this._store[keys[i]] = null;
       }
     }
     var storage = StorageExpires(myStorage);
