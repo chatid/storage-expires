@@ -8,8 +8,8 @@ module.exports = {
   },
   output: {
     path: __dirname + '/dist',
-    filename: '[name].js',
-    library: '[name]',
+    filename: 'storage-expires.js',
+    library: 'StorageExpires',
     libraryTarget: 'umd'
   }
 };
