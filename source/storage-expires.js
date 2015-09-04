@@ -24,24 +24,24 @@ module.exports = function(storage) {
     get: function(key) {
       var storageExpires = this,
           data = storage.get.apply(this, arguments) || '',
-          fail = function(key) { storageExpires.unset(key); },
+          fail = function() { storageExpires.unset(key); },
           ref, expires, value;
 
       // Fail if `value` doesn't comply with expirable-key protocol.
-      if (typeof data != 'string') return fail(key);
+      if (typeof data != 'string') return fail();
 
       ref = this.decode(data);
       expires = ref[0];
 
       try { value = this.deserialize(ref[1]); }
-      catch (e) { return fail(key); }
+      catch (e) { return fail(); }
 
       // `undefined` does not comply with protocol.
       if (typeof expires === 'undefined') {
-        return fail(key);
+        return fail();
       // -1 means no expiration.
       } else if (expires != -1) {
-        if (new Date(expires) < new Date) return fail(key);
+        if (new Date(expires) < new Date) return fail();
       }
 
       return value;
