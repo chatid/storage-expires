@@ -23,16 +23,18 @@ module.exports = function(storage) {
     // does not comply with the protocol.
     get: function(key) {
       var storageExpires = this,
-          value = storage.get.apply(this, arguments) || '',
+          data = storage.get.apply(this, arguments) || '',
           fail = function(key) { storageExpires.unset(key); },
-          ref, expires;
+          ref, expires, value;
 
       // Fail if `value` doesn't comply with expirable-key protocol.
-      if (typeof value != 'string') return fail(key);
+      if (typeof data != 'string') return fail(key);
 
-      ref = this.decode(value);
+      ref = this.decode(data);
       expires = ref[0];
-      value = ref[1];
+
+      try { value = this.deserialize(ref[1]); }
+      catch (e) { return fail(key); }
 
       // `undefined` does not comply with protocol.
       if (typeof expires === 'undefined') {
@@ -46,7 +48,7 @@ module.exports = function(storage) {
     },
 
     set: function(key, value, options) {
-      return storage.set(key, this.encode(value, options));
+      return storage.set(key, this.encode(this.serialize(value), options));
     },
 
     serialize: function(value) {
@@ -61,14 +63,14 @@ module.exports = function(storage) {
     encode: function(value, options) {
       var e;
       options = options || {};
-      value = (+options.expires || -1) + ' ' + this.serialize(value);
+      value = (+options.expires || -1) + ' ' + value;
       return value;
     },
 
     // Parse the timestamp and value, returning [undefined, undefined] if the value
     // does not comply with the protocol.
     decode: function(data) {
-      var index, expires, value,
+      var index, expires,
           fail = function() { return [undefined, undefined]; };
 
       if (!data) return fail();
@@ -83,11 +85,8 @@ module.exports = function(storage) {
       // Check for NaN
       if (expires != +expires) return fail();
 
-      try { value = this.deserialize(data); }
-      catch (e) { return fail(); }
-
-      return [expires, value];
-    },
+      return [expires, data];
+    }
 
   });
 
