@@ -49,11 +49,19 @@ module.exports = function(storage) {
       return storage.set(key, this.encode(value, options));
     },
 
+    serialize: function(value) {
+      return JSON.stringify(value);
+    },
+
+    deserialize: function(data) {
+      return JSON.parse(data);
+    },
+
     // Prepend a timestamp to any value.
     encode: function(value, options) {
       var e;
       options = options || {};
-      value = (+options.expires || -1) + ' ' + JSON.stringify(value);
+      value = (+options.expires || -1) + ' ' + this.serialize(value);
       return value;
     },
 
@@ -70,12 +78,12 @@ module.exports = function(storage) {
       if (index === -1) return fail();
 
       expires = parseInt(data.substring(0, index), 10);
-      value = data.substring(index + 1);
+      data = data.substring(index + 1);
 
       // Check for NaN
       if (expires != +expires) return fail();
 
-      try { value = JSON.parse(value); }
+      try { value = this.deserialize(data); }
       catch (e) { return fail(); }
 
       return [expires, value];
