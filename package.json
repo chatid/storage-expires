@@ -2,7 +2,7 @@
   "name": "storage-expires",
   "version": "0.0.1",
   "description": "Wrapper around a given storage interface to facilitate key expiration",
-  "main": "storage-expires.js",
+  "main": "source/storage-expires.js",
   "directories": {
     "test": "test"
   },

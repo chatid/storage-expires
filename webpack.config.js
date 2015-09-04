@@ -4,10 +4,10 @@ module.exports = {
   // `Error: a dependency to an entry point is not allowed`
   // https://github.com/webpack/webpack/issues/300
   entry: {
-    'storage-expires': ['./storage-expires'],
+    'storage-expires': ['./source/storage-expires'],
   },
   output: {
-    path: __dirname + '/dist',
+    path: __dirname,
     filename: 'storage-expires.js',
     library: 'StorageExpires',
     libraryTarget: 'umd'
