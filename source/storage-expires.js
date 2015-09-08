@@ -32,12 +32,10 @@ module.exports = function(storage) {
 
       ref = this.decode(data);
       expires = ref[0];
-
-      try { value = this.deserialize(ref[1]); }
-      catch (e) { return fail(); }
+      value = this.deserialize(ref[1]);
 
       // `undefined` does not comply with protocol.
-      if (typeof expires === 'undefined') {
+      if (typeof expires === 'undefined' || typeof value === 'undefined') {
         return fail();
       // -1 means no expiration.
       } else if (expires != -1) {
@@ -56,7 +54,11 @@ module.exports = function(storage) {
     },
 
     deserialize: function(data) {
-      return JSON.parse(data);
+      try {
+        return JSON.parse(data);
+      } catch (e) {
+        return;
+      }
     },
 
     // Prepend a timestamp to any value.
